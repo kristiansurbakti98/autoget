@@ -1,0 +1,31 @@
+name: Airdrop Bot - Auto Claim & GM
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'   # Jalan setiap 4 jam
+  workflow_dispatch:         # Bisa dijalankan manual
+
+jobs:
+  interlink-claim:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install Interlink Bot
+        run: |
+          git clone https://github.com/vikitoshi/Interlink-Auto-Bot.git interlink-bot
+          cd interlink-bot
+          npm install
+          
+      - name: Run Interlink Claim
+        run: |
+          cd interlink-bot
+          echo "EMAIL=${{ secrets.INTERLINK_EMAIL }}" > .env
+          echo "PASSCODE=${{ secrets.INTERLINK_PASSCODE }}" >> .env
+          node index.js
