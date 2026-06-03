@@ -1,36 +1,39 @@
-// Pharos Auto Daily Check-in Script
-// Sumber: https://github.com/shotiko209/Pharos-Auto-Bot
+name: Pharos GM Bot
 
-const { execSync } = require('child_process');
-const fs = require('fs');
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
-async function main() {
-    console.log('[+] Starting Pharos Daily Check-in...');
-    
-    // Clone repository jika belum ada
-    if (!fs.existsSync('./pharos-bot')) {
-        console.log('[+] Cloning Pharos bot...');
-        execSync('git clone https://github.com/shotiko209/Pharos-Auto-Bot.git pharos-bot', { stdio: 'inherit' });
-    }
-    
-    // Install dependencies
-    console.log('[+] Installing dependencies...');
-    execSync('cd pharos-bot && npm install', { stdio: 'inherit' });
-    
-    // Create .env file with private key from secrets
-    const privateKey = process.env.PHAROS_PRIVATE_KEY;
-    if (!privateKey) {
-        console.error('[-] PHAROS_PRIVATE_KEY not set in secrets!');
-        process.exit(1);
-    }
-    
-    fs.writeFileSync('./pharos-bot/.env', `PRIVATE_KEY_1=${privateKey}\n`);
-    
-    // Run the bot
-    console.log('[+] Running daily check-in...');
-    execSync('cd pharos-bot && node index.js', { stdio: 'inherit' });
-    
-    console.log('[+] Pharos daily check-in completed!');
-}
-
-main().catch(console.error);
+jobs:
+  pharos-gm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Clone Pharos Bot (WORKING REPO)
+        run: |
+          git clone https://github.com/versiaever/Pharos-Testnet-Bot.git pharos-bot
+          
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          cd pharos-bot
+          pip install -r requirements.txt
+          pip uninstall -y web3 eth-account
+          pip install web3==6.15.0 eth-account==0.11.0
+          
+      - name: Create accounts.txt
+        run: |
+          cd pharos-bot
+          echo "${{ secrets.PHAROS_PRIVATE_KEY }}" > accounts.txt
+          
+      - name: Run Pharos GM Bot (bot1.py)
+        run: |
+          cd pharos-bot
+          python bot1.py
