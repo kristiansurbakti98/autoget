@@ -1,12 +1,12 @@
-name: Pharos Auto Bot (No Menu)
+name: Pharos Run All Features (Option 6)
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */12 * * *'
   workflow_dispatch:
 
 jobs:
-  pharos-auto:
+  pharos-all:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,7 +33,7 @@ jobs:
           cd pharos-bot
           echo "${{ secrets.PHAROS_PRIVATE_KEY }}" > accounts.txt
           
-      - name: Run AutoStaking Bot (No Menu)
+      - name: Run ALL Features - Auto select Option 6
         run: |
           cd pharos-bot
-          python bot12.py
+          echo "6" | python bot1.py
