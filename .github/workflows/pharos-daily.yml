@@ -2,37 +2,21 @@ name: Pharos Daily Check-in (GM)
 
 on:
   schedule:
-    - cron: '0 0 * * *'
-    - cron: '0 12 * * *'
+    - cron: '0 0 * * *'      # Setiap hari jam 00:00 UTC
+    - cron: '0 12 * * *'     # Juga jam 12:00 UTC (2x sehari)
   workflow_dispatch:
 
 jobs:
   pharos-gm:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Clone Pharos bot
-        run: |
-          git clone https://github.com/shotiko209/Pharos-Auto-Bot.git pharos-bot
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
-          
-      - name: Install dependencies
-        run: |
-          cd pharos-bot
-          npm install
-          
-      - name: Create .env file
-        run: |
-          cd pharos-bot
-          echo "PRIVATE_KEY_1=${{ secrets.PHAROS_PRIVATE_KEY }}" > .env
-          
+      
       - name: Run Pharos Daily Check-in
-        run: |
-          cd pharos-bot
-          node index.js
+        env:
+          PHAROS_PRIVATE_KEY: ${{ secrets.PHAROS_PRIVATE_KEY }}
+        run: node scripts/pharos-daily.js
