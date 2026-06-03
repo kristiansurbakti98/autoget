@@ -1,4 +1,4 @@
-name: Interlink Multi Bot
+name: Interlink Multi Bot (Fixed)
 
 on:
   schedule:
@@ -18,17 +18,21 @@ jobs:
       - name: Clone Multi Bot
         run: git clone https://github.com/cryptodai3/Interlink-Multi-Bot.git
         
-      - name: Create accounts.txt
+      - name: Create accounts.txt with CORRECT format
         run: |
           cd Interlink-Multi-Bot
           echo "${{ secrets.INTERLINK_EMAIL }}:${{ secrets.INTERLINK_PASSCODE }}" > accounts.txt
+          # Verifikasi file
+          cat accounts.txt
           
       - name: Install dependencies
         run: |
           cd Interlink-Multi-Bot
           npm install
           
-      - name: Run multi bot
+      - name: Run multi bot with auto input
         run: |
           cd Interlink-Multi-Bot
-          node index.js
+          # Baca email dari file dan kirim ke bot
+          EMAIL=$(cut -d':' -f1 accounts.txt)
+          echo "$EMAIL" | node index.js
