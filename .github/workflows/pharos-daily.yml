@@ -1,22 +1,39 @@
-name: Pharos Daily Check-in (GM)
+name: Pharos GM Bot
 
 on:
   schedule:
-    - cron: '0 0 * * *'      # Setiap hari jam 00:00 UTC
-    - cron: '0 12 * * *'     # Juga jam 12:00 UTC (2x sehari)
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
   pharos-gm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v4
+      - name: Clone Pharos Bot (WORKING REPO)
+        run: |
+          git clone https://github.com/versiaever/Pharos-Testnet-Bot.git pharos-bot
+          
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          node-version: '18'
-      
-      - name: Run Pharos Daily Check-in
-        env:
-          PHAROS_PRIVATE_KEY: ${{ secrets.PHAROS_PRIVATE_KEY }}
-        run: node scripts/pharos-daily.js
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          cd pharos-bot
+          pip install -r requirements.txt
+          pip uninstall -y web3 eth-account
+          pip install web3==6.15.0 eth-account==0.11.0
+          
+      - name: Create accounts.txt
+        run: |
+          cd pharos-bot
+          echo "${{ secrets.PHAROS_PRIVATE_KEY }}" > accounts.txt
+          
+      - name: Run Pharos GM Bot (bot1.py)
+        run: |
+          cd pharos-bot
+          python bot1.py
