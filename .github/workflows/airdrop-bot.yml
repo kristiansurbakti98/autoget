@@ -1,4 +1,4 @@
-name: Interlink Airdrop Claimer
+name: Interlink Multi Bot
 
 on:
   schedule:
@@ -6,23 +6,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  claim:
+  multi-claim:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      
+      - uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
-      - name: Clone Interlink Bot
-        run: git clone https://github.com/vikitoshi/Interlink-Auto-Bot.git
+          node-version: '18'
+          
+      - name: Clone Multi Bot
+        run: git clone https://github.com/cryptodai3/Interlink-Multi-Bot.git
+        
+      - name: Create accounts.txt
+        run: |
+          cd Interlink-Multi-Bot
+          echo "${{ secrets.INTERLINK_EMAIL }}:${{ secrets.INTERLINK_PASSCODE }}" > accounts.txt
+          
       - name: Install dependencies
         run: |
-          cd Interlink-Auto-Bot
+          cd Interlink-Multi-Bot
           npm install
-      - name: Run claimer
-        env:
-          EMAIL: ${{ secrets.INTERLINK_EMAIL }}
-          PASSWORD: ${{ secrets.INTERLINK_PASS }}
+          
+      - name: Run multi bot
         run: |
-          cd Interlink-Auto-Bot
+          cd Interlink-Multi-Bot
           node index.js
